@@ -1,55 +1,48 @@
+import { Image } from 'expo-image';
 import { router } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
-import { StyleSheet, Text } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 
-import { Screen } from '@/components/screen';
-import { Colors, Spacing } from '@/constants/theme';
+import { Colors } from '@/constants/theme';
 
 /**
- * Splash = أول شاشة بتفتح مع التطبيق (لأن الملف اسمه index.tsx → المسار `/`).
+ * Splash — Midnight Galaxy V1
  *
- * بعد ثانية ونص بنعمل replace للـ Menu:
- * replace مش push، عشان لو المستخدم ضغط Back ميرجعش للـ Splash.
+ * نفس أسلوب المنيو: صورة الديزاين كاملة كخلفية
+ * (العنوان + الصاروخ + لودينج الدوتس مرسومين جوه الصورة).
+ *
+ * بعد ~1.8 ثانية → replace للـ Menu
+ * (replace مش push عشان Back ميرجعش هنا).
  */
-export default function SplashScreen() {
+export default function SplashScreenRoute() {
   useEffect(() => {
+    // لما صورتنا تظهر، نخفي الـ splash الأصلي بتاع Expo
+    SplashScreen.hideAsync().catch(() => {});
+
     const timer = setTimeout(() => {
       router.replace('/menu');
-    }, 1500);
+    }, 1800);
 
     return () => clearTimeout(timer);
   }, []);
 
   return (
-    <Screen style={styles.center}>
-      <Text style={styles.eyebrow}>Midnight Galaxy</Text>
-      <Text style={styles.title}>ROCKET BREAKER</Text>
-      <Text style={styles.loading}>Loading...</Text>
-    </Screen>
+    <View style={styles.root}>
+      <Image
+        source={require('@/assets/images/splash-bg.jpg')}
+        style={StyleSheet.absoluteFill}
+        contentFit="cover"
+        contentPosition="bottom"
+        accessibilityIgnoresInvertColors
+      />
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  center: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: Spacing.two,
-  },
-  eyebrow: {
-    color: Colors.muted,
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  title: {
-    color: Colors.accentPink,
-    fontSize: 28,
-    fontWeight: '800',
-    letterSpacing: 1,
-  },
-  loading: {
-    marginTop: Spacing.five,
-    color: Colors.accentCyan,
-    fontSize: 14,
-    fontWeight: '600',
+  root: {
+    flex: 1,
+    backgroundColor: Colors.background,
   },
 });

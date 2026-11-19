@@ -1,10 +1,15 @@
 import { Stack } from 'expo-router';
 import { NavigationBar } from 'expo-navigation-bar';
+import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import * as SystemUI from 'expo-system-ui';
 import { useEffect } from 'react';
 
 import { Colors } from '@/constants/theme';
+
+// نخلي الـ splash الأصلي يفضل ظاهر لحد ما شاشة اللعبة (الصورة) تبقى جاهزة
+SplashScreen.preventAutoHideAsync();
+SplashScreen.setOptions({ duration: 800, fade: true });
 
 /**
  * Root Layout = مدخل التنقّل كله.
