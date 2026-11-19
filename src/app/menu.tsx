@@ -23,7 +23,8 @@ export default function MenuScreen() {
         source={require('@/assets/images/menu-bg.jpg')}
         style={StyleSheet.absoluteFill}
         contentFit="cover"
-        contentPosition="center"
+        // نثبّت أسفل الصورة عشان منطقة الـ navigation bar تاخد نفس لون المشهد
+        contentPosition="bottom"
         accessibilityIgnoresInvertColors
       />
 

@@ -1,5 +1,8 @@
 import { Stack } from 'expo-router';
+import { NavigationBar } from 'expo-navigation-bar';
 import { StatusBar } from 'expo-status-bar';
+import * as SystemUI from 'expo-system-ui';
+import { useEffect } from 'react';
 
 import { Colors } from '@/constants/theme';
 
@@ -11,12 +14,18 @@ import { Colors } from '@/constants/theme';
  * - replace: تبدّل الشاشة الحالية (مفيدة في Splash → Menu)
  * - back: ترجع لورا
  *
- * headerShown: false عشان الألعاب عادة من غير شريط عنوان النظام.
+ * NavigationBar style="light" = أزرار/إيماءات فاتحة فوق خلفية غامقة.
+ * SystemUI بيخلي خلفية الـ root نفس لون الثيم عشان شريط الأندرويد السفلي مايبانش بلون تاني.
  */
 export default function RootLayout() {
+  useEffect(() => {
+    SystemUI.setBackgroundColorAsync(Colors.background);
+  }, []);
+
   return (
     <>
       <StatusBar style="light" />
+      <NavigationBar style="light" />
       <Stack
         screenOptions={{
           headerShown: false,
