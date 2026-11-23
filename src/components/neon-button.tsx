@@ -1,3 +1,4 @@
+import { LinearGradient } from 'expo-linear-gradient';
 import { Pressable, StyleSheet, Text, ViewStyle } from 'react-native';
 
 import { Colors, Spacing } from '@/constants/theme';
@@ -11,8 +12,8 @@ type NeonButtonProps = {
 };
 
 /**
- * زر بسيط بنفس روح الثيم.
- * بعدين لما نزوّق الواجهة هنبدّل الألوان/الظلال من هنا مرة واحدة.
+ * زر بروح Midnight Galaxy.
+ * primary = تدرج بنفسجي → سيان زي الديزاين
  */
 export function NeonButton({
   label,
@@ -26,15 +27,24 @@ export function NeonButton({
     <Pressable
       accessibilityRole="button"
       onPress={onPress}
-      style={({ pressed }) => [
-        styles.base,
-        isPrimary ? styles.primary : styles.secondary,
-        pressed && styles.pressed,
-        style,
-      ]}>
-      <Text style={[styles.label, isPrimary ? styles.labelPrimary : styles.labelSecondary]}>
-        {label}
-      </Text>
+      style={({ pressed }) => [pressed && styles.pressed, style]}>
+      {isPrimary ? (
+        <LinearGradient
+          colors={['#8b5cf6', '#38bdf8']}
+          start={{ x: 0, y: 0.5 }}
+          end={{ x: 1, y: 0.5 }}
+          style={[styles.base, styles.primary]}>
+          <Text style={[styles.label, styles.labelPrimary]}>{label}</Text>
+        </LinearGradient>
+      ) : (
+        <LinearGradient
+          colors={['#1a2240', '#151a2e']}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={[styles.base, styles.secondary]}>
+          <Text style={[styles.label, styles.labelSecondary]}>{label}</Text>
+        </LinearGradient>
+      )}
     </Pressable>
   );
 }
@@ -44,17 +54,15 @@ const styles = StyleSheet.create({
     borderRadius: 999,
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
+    borderWidth: 1.5,
   },
   primary: {
-    backgroundColor: Colors.accent,
     borderColor: Colors.accentCyan,
     paddingVertical: Spacing.three,
     paddingHorizontal: Spacing.five,
     minHeight: 56,
   },
   secondary: {
-    backgroundColor: Colors.panel,
     borderColor: Colors.line,
     paddingVertical: Spacing.two + 2,
     paddingHorizontal: Spacing.four,
@@ -64,15 +72,15 @@ const styles = StyleSheet.create({
     opacity: 0.85,
   },
   label: {
-    fontWeight: '700',
-    letterSpacing: 0.5,
+    fontWeight: '800',
+    letterSpacing: 0.8,
   },
   labelPrimary: {
     color: Colors.text,
     fontSize: 18,
   },
   labelSecondary: {
-    color: Colors.muted,
+    color: Colors.text,
     fontSize: 15,
   },
 });
