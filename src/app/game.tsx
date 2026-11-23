@@ -1,25 +1,28 @@
 import { Image } from 'expo-image';
 import { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
+import { GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { PlayerRocket } from '@/components/player-rocket';
+import { ROCKET_BOTTOM } from '@/constants/game';
 import { Colors, Spacing } from '@/constants/theme';
+import { useRocketMovement } from '@/hooks/use-rocket-movement';
 
 /**
- * الخطوة 1 من اللعب: Arena + Score + خلفية المجرة
+ * Gameplay
  *
- * الطبقات من تحت لفوق:
- * 1) صورة المجرة (خلفية ثابتة)
- * 2) Arena فاضية (هنا هنحط الصاروخ/الحجارة بعدين)
- * 3) HUD السكور فوق الكل
+ * الشاشة بتجمع الطبقات بس.
+ * منطق الصاروخ والحركة موجود في: useRocketMovement
  */
 export default function GameScreen() {
   const insets = useSafeAreaInsets();
   const [score] = useState(0);
 
+  const { rocketX, panGesture, onArenaLayout } = useRocketMovement();
+
   return (
-    <View style={styles.root}>
-      {/* طبقة الخلفية: المجرة */}
+    <GestureHandlerRootView style={styles.root}>
       <Image
         source={require('@/assets/images/game-bg.jpg')}
         style={StyleSheet.absoluteFill}
@@ -28,7 +31,6 @@ export default function GameScreen() {
         accessibilityIgnoresInvertColors
       />
 
-      {/* HUD فوق */}
       <View style={[styles.hud, { paddingTop: insets.top + Spacing.two }]}>
         <View style={styles.scoreBadge}>
           <Text style={styles.scoreLabel}>SCORE</Text>
@@ -36,9 +38,15 @@ export default function GameScreen() {
         </View>
       </View>
 
-      {/* Arena فاضية فوق الخلفية — جاهزة للعناصر الجاية */}
-      <View style={styles.arena} />
-    </View>
+      <GestureDetector gesture={panGesture}>
+        <View style={styles.arena} onLayout={onArenaLayout}>
+          <PlayerRocket
+            translateX={rocketX}
+            bottom={Math.max(insets.bottom, Spacing.two) + ROCKET_BOTTOM}
+          />
+        </View>
+      </GestureDetector>
+    </GestureHandlerRootView>
   );
 }
 
