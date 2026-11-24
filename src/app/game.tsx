@@ -1,25 +1,42 @@
 import { Image } from 'expo-image';
 import { useState } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { LayoutChangeEvent, StyleSheet, Text, View } from 'react-native';
 import { GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { NeonShot } from '@/components/neon-shot';
 import { PlayerRocket } from '@/components/player-rocket';
 import { ROCKET_BOTTOM } from '@/constants/game';
 import { Colors, Spacing } from '@/constants/theme';
 import { useRocketMovement } from '@/hooks/use-rocket-movement';
+import { useRocketShots } from '@/hooks/use-rocket-shots';
 
 /**
  * Gameplay
  *
- * الشاشة بتجمع الطبقات بس.
- * منطق الصاروخ والحركة موجود في: useRocketMovement
+ * - اسحبي على الشاشة → الصاروخ يتحرك + يطلق طلقات
+ * - شيلي إيدك → الإطلاق يقف (الطلقات اللي في الجو تكمل)
  */
 export default function GameScreen() {
   const insets = useSafeAreaInsets();
   const [score] = useState(0);
+  const [arenaSize, setArenaSize] = useState({ width: 0, height: 0 });
 
-  const { rocketX, panGesture, onArenaLayout } = useRocketMovement();
+  const rocketBottom = Math.max(insets.bottom, Spacing.two) + ROCKET_BOTTOM;
+  const { rocketX, panGesture, onArenaLayout, isTouching } = useRocketMovement();
+  const { shots } = useRocketShots({
+    rocketX,
+    rocketBottom,
+    arenaWidth: arenaSize.width,
+    arenaHeight: arenaSize.height,
+    isTouching,
+  });
+
+  const handleArenaLayout = (event: LayoutChangeEvent) => {
+    const { width, height } = event.nativeEvent.layout;
+    setArenaSize({ width, height });
+    onArenaLayout(event);
+  };
 
   return (
     <GestureHandlerRootView style={styles.root}>
@@ -39,11 +56,12 @@ export default function GameScreen() {
       </View>
 
       <GestureDetector gesture={panGesture}>
-        <View style={styles.arena} onLayout={onArenaLayout}>
-          <PlayerRocket
-            translateX={rocketX}
-            bottom={Math.max(insets.bottom, Spacing.two) + ROCKET_BOTTOM}
-          />
+        <View style={styles.arena} onLayout={handleArenaLayout}>
+          {shots.map((shot) => (
+            <NeonShot key={shot.id} x={shot.x} y={shot.y} />
+          ))}
+
+          <PlayerRocket translateX={rocketX} bottom={rocketBottom} />
         </View>
       </GestureDetector>
     </GestureHandlerRootView>

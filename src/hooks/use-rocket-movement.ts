@@ -1,28 +1,28 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { LayoutChangeEvent } from 'react-native';
 import { Gesture } from 'react-native-gesture-handler';
-import { useSharedValue } from 'react-native-reanimated';
+import { runOnJS, useSharedValue } from 'react-native-reanimated';
 
 import { ROCKET_SIDE_PADDING, ROCKET_WIDTH } from '@/constants/game';
 
 /**
  * useRocketMovement
  *
- * Hook مسؤول عن الصاروخ + حركته فقط:
- * - rocketX: مكان الصاروخ أفقيًا (0 = منتصف الشاشة)
- * - panGesture: سحب الإصبع يمين/شمال
- * - onArenaLayout: يعرف عرض الحلبة عشان الحدود
- *
- * ليه Hook؟ عشان شاشة اللعب تفضل بسيطة، ومنطق الحركة يبقى في مكان واحد سهل تتعلميه وتعدّليه.
+ * مسؤول عن:
+ * - حركة الصاروخ يمين/شمال
+ * - معرفة هل في لمس على الشاشة دلوقتي (isTouching)
+ *   ← دي اللي بتخلّي الطلقات تطلع وقت اللمس بس
  */
 export function useRocketMovement() {
   const arenaWidth = useSharedValue(0);
   const rocketX = useSharedValue(0);
   const dragStartX = useSharedValue(0);
+  const [isTouching, setIsTouching] = useState(false);
 
   const panGesture = Gesture.Pan()
     .onBegin(() => {
       dragStartX.value = rocketX.value;
+      runOnJS(setIsTouching)(true);
     })
     .onUpdate((event) => {
       const nextX = dragStartX.value + event.translationX;
@@ -33,6 +33,10 @@ export function useRocketMovement() {
       const maxX = halfArena - halfRocket - ROCKET_SIDE_PADDING;
 
       rocketX.value = Math.min(maxX, Math.max(minX, nextX));
+    })
+    .onFinalize(() => {
+      // سواء الحركة خلصت أو الإصبع اتشال
+      runOnJS(setIsTouching)(false);
     });
 
   const onArenaLayout = useCallback(
@@ -46,5 +50,6 @@ export function useRocketMovement() {
     rocketX,
     panGesture,
     onArenaLayout,
+    isTouching,
   };
 }
