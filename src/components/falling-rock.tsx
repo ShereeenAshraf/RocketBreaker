@@ -1,48 +1,45 @@
 import { Image } from 'expo-image';
-import { StyleSheet, View } from 'react-native';
-
-/**
- * أشكال الحجارة المتاحة (كلها من غير وجوه، بألوان ثيم Midnight Galaxy).
- * a = دايري تقريبًا | b = طويل | c = مدبّب
- */
-export type RockVariant = 'a' | 'b' | 'c';
-
-const ROCK_SOURCES = {
-  a: require('@/assets/images/rock-a.png'),
-  b: require('@/assets/images/rock-b.png'),
-  c: require('@/assets/images/rock-c.png'),
-} as const;
+import { StyleSheet } from 'react-native';
+import Animated, { SharedValue, useAnimatedStyle } from 'react-native-reanimated';
 
 type FallingRockProps = {
+  /** الحافة الشمال */
   x: number;
-  y: number;
+  /** مكان الحجر الرأسي (بيتحرك على UI thread) */
+  y: SharedValue<number>;
+  /** الدوران بالدرجات */
+  rotation: SharedValue<number>;
   /** عرض/ارتفاع الحجر (مربع) */
   size: number;
-  variant: RockVariant;
 };
 
 /**
- * FallingRock = حجر واحد بينزل من فوق.
- * شكل بس: المكان والحجم بييجوا من بره (من hook الحجارة بعدين).
+ * FallingRock = الصخرة البنفسجية المتوهجة وهي بتنزل من فوق وتلف.
+ * الحركة بالـ transform (مش top) عشان تبقى ناعمة، والقيم جاية من الـ hook.
  */
-export function FallingRock({ x, y, size, variant }: FallingRockProps) {
+export function FallingRock({ x, y, rotation, size }: FallingRockProps) {
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateY: y.value }, { rotate: `${rotation.value}deg` }],
+  }));
+
   return (
-    <View
+    <Animated.View
       pointerEvents="none"
-      style={[styles.wrap, { left: x, top: y, width: size, height: size }]}>
+      style={[styles.wrap, { left: x, width: size, height: size }, animatedStyle]}>
       <Image
-        source={ROCK_SOURCES[variant]}
+        source={require('@/assets/images/rock.png')}
         style={styles.image}
         contentFit="contain"
         accessibilityLabel="Falling rock"
       />
-    </View>
+    </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
   wrap: {
     position: 'absolute',
+    top: 0,
   },
   image: {
     width: '100%',

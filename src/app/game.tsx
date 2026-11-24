@@ -4,10 +4,12 @@ import { LayoutChangeEvent, StyleSheet, Text, View } from 'react-native';
 import { GestureDetector, GestureHandlerRootView } from 'react-native-gesture-handler';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { FallingRock } from '@/components/falling-rock';
 import { NeonShot } from '@/components/neon-shot';
 import { PlayerRocket } from '@/components/player-rocket';
 import { ROCKET_BOTTOM } from '@/constants/game';
 import { Colors, Spacing } from '@/constants/theme';
+import { useFallingRocks } from '@/hooks/use-falling-rocks';
 import { useRocketMovement } from '@/hooks/use-rocket-movement';
 import { useRocketShots } from '@/hooks/use-rocket-shots';
 
@@ -30,6 +32,10 @@ export default function GameScreen() {
     arenaWidth: arenaSize.width,
     arenaHeight: arenaSize.height,
     isTouching,
+  });
+  const { rocks } = useFallingRocks({
+    arenaWidth: arenaSize.width,
+    arenaHeight: arenaSize.height,
   });
 
   const handleArenaLayout = (event: LayoutChangeEvent) => {
@@ -57,6 +63,16 @@ export default function GameScreen() {
 
       <GestureDetector gesture={panGesture}>
         <View style={styles.arena} onLayout={handleArenaLayout}>
+          {rocks.map((rock) => (
+            <FallingRock
+              key={rock.id}
+              x={rock.x}
+              y={rock.y}
+              rotation={rock.rotation}
+              size={rock.size}
+            />
+          ))}
+
           {shots.map((shot) => (
             <NeonShot key={shot.id} x={shot.x} y={shot.y} />
           ))}

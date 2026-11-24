@@ -17,3 +17,14 @@ export const NEON_SHOT_SPEED = 14;
 export const NEON_SHOT_FIRE_INTERVAL_MS = 260;
 /** أقصى عدد طلقات ظاهرة في نفس الوقت */
 export const MAX_NEON_SHOTS = 12;
+
+/** الحجارة النازلة */
+export const ROCK_MIN_SIZE = 56;
+export const ROCK_MAX_SIZE = 96;
+/** سرعة الحجر لتحت (بكسل تقريبًا لكل فريم ~16ms) */
+export const ROCK_MIN_SPEED = 1;
+export const ROCK_MAX_SPEED = 2.5;
+/** كل قد إيه ينزل حجر جديد */
+export const ROCK_SPAWN_INTERVAL_MS = 900;
+/** أقصى عدد حجارة ظاهرة في نفس الوقت */
+export const MAX_ROCKS = 10;
